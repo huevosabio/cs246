@@ -1,0 +1,243 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\begin{document}
+\thispagestyle{empty}
+\parindent 0pt
+\vfill
+\large
+
+\begin{center}
+\LARGE{\bf \textsf{CS246: Mining Massive Datasets}}\\ {\bf \textsf{Homework 2}} 
+\\*[4ex]
+\end{center}
+
+\section*{Answer to Question 1(a)}
+
+From the problem,
+
+\begin{equation}
+    r'_i = \sum_{j} m_{ij} r_j \, ,
+\end{equation}
+and 
+\begin{equation}
+    w(\bm{r}) = \sum_i r_i.
+\end{equation}
+Thus,
+\begin{equation}
+        \begin{split}
+            w(\bm{r}') & = \sum_i \sum_j m_{ij} r_j \,, \\
+            & = \sum_j \sum_i m_{ij} r_j \, , \\
+            & = \sum_j r_j (\sum_i m_{ij}) \, , \\
+            & = \sum_j r_j \, ,\\
+            & = w(\bm{r}) \, .
+        \end{split}
+\end{equation}
+
+\pagebreak[4]
+\section*{Answer to Question 1(b)}
+
+From the problem,
+
+\begin{equation}
+    r'_i = \beta \sum_j m_{ij} r_j + (1 - \beta) / n \, .
+\end{equation}
+
+As before,
+\begin{equation}
+    \begin{split}
+        w(\bm{r}') & = \sum_i r'_i = \sum_i ( \beta \sum_j m_{ij} r_j + (1 - \beta) / n ) \, \\
+        & = (1 - \beta) + \beta \sum_j r_j \sum_i m_{ij}  \, , \\
+        & = (1 - \beta) + \beta \sum_j r_j \, .
+    \end{split}
+\end{equation}
+
+From the last equivalence, it follows that $w(\bm{r}') = w(\bm{r})$ if $ \sum_i r_i = 1$.
+
+\pagebreak[4]
+\section*{Answer to Question 1(c)}
+
+Let $\mathcal{L}$ be the set of live nodes, and $\mathcal{D}$ the set of dead nodes. From the problem definition we can write our update rule as:
+\begin{equation}
+    r'_i = \sum_j m_{ij} r_j \beta + T_j \, ,
+\end{equation}
+where,
+
+\begin{equation*}
+    T_j = 
+    \begin{cases}
+    (1 - \beta) r_j / n & \text{if } j \in \mathcal{L} \, ,\\
+    r_j / n & \text{if } j \in \mathcal{D} \, .
+    \end{cases}
+\end{equation*}
+
+Note that for the case of dead nodes, we can separate the $T_j$ component into two parts,
+\begin{equation}
+    r_j / n = \beta r_j /n + (1 - \beta) r_j / n \,.
+\end{equation}
+
+With this information, we can create a surrogate matrix $\hat{M}$ such that
+\begin{equation}
+    \hat{m}_{ij} = 
+    \begin{cases}
+        m_{ij} & \text{if } j \in \mathcal{L} \, , \\
+        1 /n & \text{if } j \in \mathcal{D} \, .
+    \end{cases}
+\end{equation}
+
+Thus, we can write our update rule in terms of this surrogate matrix:
+\begin{equation}
+    \begin{split}
+        r'_i  & = \sum_j \hat{m}_{ij} r_j \beta + (1 - \beta ) r_j /n \, , \\
+        & = \beta \sum_j \hat{m}_{ij} r_j + (1 - \beta)  / n \, . \\
+    \end{split}
+\end{equation}
+Which is identical in form to the previous question, from which it follows that $w(\bm{r}') = 1$.
+
+\pagebreak[4]
+\section*{Answer to Question 2(a)}
+
+Assuming $M$ is real (an assumption validated by an instructor comment in Piazza), then both $M^TM $ and $MM^T$ are real. 
+
+For a matrix $A$ to be symmetric, $A^T = A$ must hold. Clearly, since $(MM^T) = (M^T)^TM = MM^T$ and $(M^TM)^T = M^T(M^T)^T$, then both are symmetric.
+
+Finally, if $M$ is a $p \times q$ matrix, then $M^TM$ is $q \times q$ and $MM^T$ is $p \times p$, making them both square.
+
+\pagebreak[4]
+\section*{Answer to Question 2(b)}
+
+Parting from the MMDS book, section 11, let's use SVD to answer this question. Let $M = U\Sigma V$ be a singular value decomposition of $M$, where $\Sigma$ is a diagonal matrix with the singular values in its diagonal. Then,
+
+\begin{equation}
+    M^TM = V \Sigma U^TU \Sigma V^T = V \Sigma^2 V^T \, ,
+\end{equation}
+
+since $U$ is an orthonormal matrix and $U^TU = I$. Rearranging, and using that fact that $V$ is also orthonormal, we get that
+
+\begin{equation}
+    M^TM V = V \Sigma^2
+\end{equation}
+
+which implies that $V$ is the matrix of eigenvectors of $M^TM$ and $\Sigma^2$ a diagonal matrix with the eigenvalues in the diagonal. Similarly, we can arrive to $MM^T U = U\Sigma^2$. This shows that the eigenvalues of $M^TM$ and $MM^T$ are the same, but their eigenvectors are different.
+
+\pagebreak[4]
+\section*{Answer to Question 2(c)}
+
+Since $M^TM$ is square, real and symmetric, we can write 
+
+\begin{equation}
+    M^TM = Q \Lambda Q^T
+\end{equation}
+
+\pagebreak[4]
+\section*{Answer to Question 2(d)}
+
+From question b), we see that $\Sigma ^2$ contains the eigenvalues and $V$ the eigenvectors, thus we can simply write 
+
+\begin{equation}
+    M^TM = V \Sigma^2 V^T
+\end{equation}
+
+\pagebreak[4]
+\section*{Answer to Question 2(e)}
+
+From the SVD of $M$ results (code submitted to SNAP):
+
+\begin{equation}
+    U=
+  \begin{bmatrix}
+    -0.27854301 &  0.5        & -0.75033067 & -0.33078343\\
+    -0.27854301 & -0.5        &  0.12733222 & -0.81006191\\
+    -0.64993368 &  0.5        &  0.57233111 &  0.00482762\\
+    -0.64993368 & -0.5        & -0.30533177 &  0.4841061 
+  \end{bmatrix}
+\end{equation}
+
+
+\begin{equation}
+    \Sigma \text{(only non-zero elements)} =
+  \begin{bmatrix}
+    7.61577311  & 1.41421356
+  \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    V =
+  \begin{bmatrix}
+    -0.70710678 & -0.70710678 \\
+    -0.70710678 &  0.70710678
+  \end{bmatrix}
+\end{equation}
+
+From the Eigendecomposition:
+
+\begin{equation}
+    Evals =
+  \begin{bmatrix}
+    58.  & 2.
+  \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    Evecs =
+  \begin{bmatrix}
+    0.70710678 & -0.70710678 \\
+    0.70710678 &  0.70710678 
+  \end{bmatrix}
+\end{equation}
+
+$V$ and $Evecs$ are the same in magnitude, but not in sign. Technically, one can arrive to a different SVD decomposition of $M$ using Eigendecomopositions of $M^TM$ and $MM^T$ and viceversa.
+
+The singular values of $M$ are the square root of the eigenvalues of $M^TM$ and $MM^T$, that is $\sqrt{\Lambda_{ii}} = \Sigma_{ii}$
+
+
+\pagebreak[4]
+\section*{Answer to Question 3(a)}
+
+\pagebreak[4]
+\section*{Answer to Question 3(b)}
+
+\pagebreak[4]
+\section*{Answer to Question 4(a)}
+
+\pagebreak[4]
+\section*{Answer to Question 4(b)}
+
+\pagebreak[4]
+\begin{center}
+\LARGE{\bf \textsf{Cover Sheet}} \\*[4ex]
+\end{center}
+
+\textbf{Assignment Submission } Fill in and include this cover sheet with each of your assignments. Assignments are due at 11:59pm. All students (SCPD and non-SCPD) must submit their homeworks via GradeScope (\url{http://www.gradescope.com}). Students can typeset or scan their homeworks. Make sure that you answer each question on a separate page. Students also need to upload their code at \url{http://snap.stanford.edu/submit}. Put all the code for a single question into a single file and upload it. Please do not put any code in your GradeScope submissions. 
+\\
+\\
+\textbf{Late Day Policy } Each student will have a total of {\em two} free late periods. {\em One late period expires at the start of each class.} (Homeworks are usually due on Thursdays, which means the first late periods expires on the following Tuesday.) Once these late periods are exhausted, any assignments turned in late will be penalized 50\% per late period. However, no assignment will be accepted more than {\em one} late period after its due date. 
+\\
+\\
+\textbf{Honor Code } We strongly encourage students to form study groups. Students may discuss and work on homework problems in groups. However, each student must write down their solutions independently i.e., each student must understand the solution well enough in order to reconstruct it by him/herself.  Students should clearly mention the names of all the other students who were part of their discussion group. Using code or solutions obtained from the web (github/google/previous year solutions etc.) is considered an honor code violation. We check all the submissions for plagiarism. We take the honor code very seriously and expect students to do the same. 
+
+\vfill
+\vfill
+
+{\Large
+\textbf{Your name:} Ramon Iglesias \\
+\textbf{Email:} rdit@stanford.edu \textbf{SUID:} rdit\\*[2ex] }
+Discussion Group (People with whom you discussed ideas used in your answers): \\\\\\
+On-line or hardcopy documents used as part of your answers: \\\\\\
+\vfill
+
+\vfill
+
+I acknowledge and accept the Honor Code.\\*[3ex]
+\bigskip
+\textit{(Signed)} RDIT
+% If you are not printing this document out, just type your initials above
+
+\vfill
+\vfill
+
+\end{document}
